@@ -14,3 +14,20 @@ ADDNEWBADDIERATE = 10
 PLAYERMOVERATE = 5
 BULLETSPEED = 10
 FIRINGRATE = 2
+
+
+
+
+
+# Add new baddies at the top of the screen, if needed.
+        baddieAddCounter += 1
+        timeCounter += 1  
+        if baddieAddCounter >= ADDNEWBADDIERATE:
+            baddieAddCounter = 0
+            baddieSize = random.randint(BADDIEMINSIZE, BADDIEMAXSIZE)
+            newBaddie = {'rect': pygame.Rect(random.randint(0, WINDOWWIDTH-baddieSize), 0 - baddieSize, baddieSize, baddieSize),
+                        'speed': random.randint(BADDIEMINSPEED, BADDIEMAXSPEED),
+                        'surface': pygame.transform.scale(baddieImage, (baddieSize, baddieSize)),
+                        }
+
+            baddies.append(newBaddie)
