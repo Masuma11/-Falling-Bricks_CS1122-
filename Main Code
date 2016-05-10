@@ -19,6 +19,14 @@ FIRINGRATE = 2
 
 
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
+>>>>>>> refs/remotes/origin/New
 # Add new baddies at the top of the screen, if needed.
         baddieAddCounter += 1
         timeCounter += 1  
@@ -32,8 +40,11 @@ FIRINGRATE = 2
 
             baddies.append(newBaddie)
             
+<<<<<<< HEAD
             
                 
+=======
+>>>>>>> refs/remotes/origin/New
         # Increase baddie speed and spawn rate every 5 seconds.
         if timeCounter == FPS * 5:
             timeCounter = 0
@@ -51,11 +62,33 @@ FIRINGRATE = 2
             playerRect.move_ip(0, -1 * PLAYERMOVERATE)
         if moveDown and playerRect.bottom < WINDOWHEIGHT:
             playerRect.move_ip(0, PLAYERMOVERATE)
+<<<<<<< HEAD
             
         # Move the baddies down.
         for b in baddies:
             b['rect'].move_ip(0, b['speed'])
             
+=======
+
+        # not yet, in progress
+        bulletCounter += 1
+        if bulletCounter == FIRINGRATE:
+            bulletCounter = 0
+            newBullet = {'rect': pygame.Rect(playerRect.left + 2, playerRect.top, 4, 4),
+                         'speed': BULLETSPEED,
+                         'surface': pygame.transform.scale(bulletImage, (4, 4)),
+                        }
+            bullets.append(newBullet)
+        
+        # Move the baddies down.
+        for b in baddies:
+            b['rect'].move_ip(0, b['speed'])
+
+        # Fire bullets.
+        for bullet in bullets:
+            bullet['rect'].move_ip(0, -bullet['speed'])
+
+>>>>>>> refs/remotes/origin/New
         # Delete baddies that have fallen past the bottom.
         for b in baddies[:]:
             if b['rect'].top > WINDOWHEIGHT:
