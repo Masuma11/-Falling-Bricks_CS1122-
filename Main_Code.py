@@ -17,9 +17,64 @@ BULLETSPEED = 15
 FIRINGRATE = 10
 BULLETPOWER = 8
 
+def terminate():
+        pygame.quit()
+        sys.exit()
+        
+def waitForPlayerToPressKey():
+        while True:
+                for event in pygame.event.get():
+                        if event.type == KEYDOWN:
+                                if event.key == K_ESCAPE:
+                                        terminate()
+                                if event.key == K_SPACE:
+                                        return
 
+def ifBulletHitBlock(bulletRect, blocks):
+        for b in blocks:
+                if bulletRect.colliderect(b['rect']):
+                        b['rect'].size = (b['rect'].size[0] - BULLETPOWER, b['rect'].size[1] - BULLETPOWER) # Resize the block
+                        (b['rect'].x, b['rect'].y) = (b['rect'].x + (BULLETPOWER / 2), b['rect'].y + (BULLETPOWER / 2)) # Re-center the block
+                if b['rect'].size > (15,  15): # If the block is bigger than 15x15 pixels:
+                        b['surface'] = pygame.transform.scale(blockImage, (b['rect'].size[0] - 8, b['rect'].size[1] - 8)) # Update the image of the block
+                                                                                                                          # to the correct pixel size.     
+                else: # Else the block is too small to be shoot at accurately
+                        blocks.remove(b) # Remove the rock from the list this would cause the rock to disappear from the screen
+ 
+def playerHasHitBlock(playerRect, blocks):
+        for b in blocks:
+                if playerRect.colliderect(b['rect']):
+                        return True
+        return False
+        
+def drawText(text, font, surface, x, y):
+        textobj = font.render(text, 1, BLACKTEXT)
+        textrect = textobj.get_rect()
+        textrect.topleft = (x, y)
+        surface.blit(textobj, textrect)
 
+def drawCenteredText(text, font, surface, x, y):
+        textobj = font.render(text, 1, BLACKTEXT)
+        textrect = textobj.get_rect()
+        x = (x - textrect.width) / 2
+        textrect.topleft = (x, y)
+        surface.blit(textobj, textrect)
+        
+# Set up pygame, the window.
+pygame.init()
+mainClock = pygame.time.Clock()
+windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+pygame.display.set_caption('Falling Blocks')
 
+# Set up fonts.
+bigFont = pygame.font.SysFont(None, 48)
+smallFont = pygame.font.SysFont(None, 30)
+
+# Set up images.
+playerImage = pygame.image.load('player.png')
+playerRect = playerImage.get_rect()
+blockImage = pygame.image.load('block.png')
+bulletImage = pygame.image.load('bullet.png')
 
 # Add new blocks at the top of the screen, if needed.
         blockAddCounter += 1
