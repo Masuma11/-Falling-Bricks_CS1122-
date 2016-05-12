@@ -106,7 +106,7 @@ while True:
 
                 for event in pygame.event.get():
                         if event.type == QUIT:
-                        terminate()
+                                terminate()
 
                 if event.type == KEYDOWN:
                         if event.key == K_LEFT:
