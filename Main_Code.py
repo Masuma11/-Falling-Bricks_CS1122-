@@ -76,6 +76,60 @@ playerRect = playerImage.get_rect()
 blockImage = pygame.image.load('block.png')
 bulletImage = pygame.image.load('bullet.png')
 
+# Show the "Start" screen.
+windowSurface.fill(WHITEBACKGROUND)
+drawCenteredText('Falling Blocks:', bigFont, windowSurface, (WINDOWWIDTH), (WINDOWHEIGHT / 3))
+drawCenteredText('Use arrow keys to move', smallFont, windowSurface, (WINDOWWIDTH), (WINDOWHEIGHT / 3) + 40)
+drawCenteredText('Shooting blocks will make them smaller', smallFont, windowSurface, (WINDOWWIDTH), (WINDOWHEIGHT / 3) + 70)
+drawCenteredText('Press SPACE to start...', smallFont, windowSurface, (WINDOWWIDTH), (WINDOWHEIGHT / 3) + 100)
+pygame.display.update()
+waitForPlayerToPressKey()
+
+inFile = open("topScore.txt", "r")
+topScore = inFile.readline().strip()
+topScore = int(topScore)
+inFile.close()
+
+while True:
+        # Set up the start of the game.
+        blocks = []
+        bullets = []
+        score = 0
+        playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 300)
+        moveLeft = moveRight = moveUp = moveDown = False
+        blockAddCounter = 0
+        bulletCounter = 0
+        timeCounter = 0
+    
+        while True: # the game loop runs while the game part is playing
+                score += 1 # increase score
+
+                for event in pygame.event.get():
+                        if event.type == QUIT:
+                        terminate()
+
+                if event.type == KEYDOWN:
+                        if event.key == K_LEFT:
+                                moveLeft = True
+                        if event.key == K_RIGHT:
+                                moveRight = True
+                        if event.key == K_UP:
+                                moveUp = True
+                        if event.key == K_DOWN:
+                                moveDown = True
+
+                if event.type == KEYUP:
+                        if event.key == K_ESCAPE:
+                                terminate()
+                        if event.key == K_LEFT:
+                                moveLeft = False
+                        if event.key == K_RIGHT:
+                                moveRight = False
+                        if event.key == K_UP:
+                                moveUp = False
+                        if event.key == K_DOWN:
+                                moveDown = False
+
 # Add new blocks at the top of the screen, if needed.
         blockAddCounter += 1
         timeCounter += 1
@@ -87,8 +141,6 @@ bulletImage = pygame.image.load('bullet.png')
                         'surface': pygame.transform.scale(blockImage, (blockSize, blockSize)),
                         }
                 blocks.append(newBlock)
-            
-            
                 
         # Increase block speed and spawn rate every 5 seconds.
         # Also increases FIRINGRATE to help survival rate
