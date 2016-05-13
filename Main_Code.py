@@ -108,69 +108,142 @@ while True:
                         if event.type == QUIT:
                                 terminate()
 
-                if event.type == KEYDOWN:
-                        if event.key == K_LEFT:
-                                moveLeft = True
-                        if event.key == K_RIGHT:
-                                moveRight = True
-                        if event.key == K_UP:
-                                moveUp = True
-                        if event.key == K_DOWN:
-                                moveDown = True
+                        if event.type == KEYDOWN:
+                                if event.key == K_LEFT:
+                                        moveLeft = True
+                                if event.key == K_RIGHT:
+                                        moveRight = True
+                                if event.key == K_UP:
+                                        moveUp = True
+                                if event.key == K_DOWN:
+                                        moveDown = True
 
-                if event.type == KEYUP:
-                        if event.key == K_ESCAPE:
-                                terminate()
-                        if event.key == K_LEFT:
-                                moveLeft = False
-                        if event.key == K_RIGHT:
-                                moveRight = False
-                        if event.key == K_UP:
-                                moveUp = False
-                        if event.key == K_DOWN:
-                                moveDown = False
+                        if event.type == KEYUP:
+                                if event.key == K_ESCAPE:
+                                        terminate()
+                                if event.key == K_LEFT:
+                                        moveLeft = False
+                                if event.key == K_RIGHT:
+                                        moveRight = False
+                                if event.key == K_UP:
+                                        moveUp = False
+                                if event.key == K_DOWN:
+                                        moveDown = False
 
-# Add new blocks at the top of the screen, if needed.
-        blockAddCounter += 1
-        timeCounter += 1
-        if blockAddCounter >= ADDNEWBLOCKRATE:
-                blockAddCounter = 0
-                blockSize = random.randint(BLOCKMINSIZE, BLOCKMAXSIZE)
-                newBlock = {'rect': pygame.Rect(random.randint(0, WINDOWWIDTH - blockSize), 0 - blockSize, blockSize, blockSize),
-                        'speed': random.randint(BLOCKMINSPEED, BLOCKMAXSPEED),
-                        'surface': pygame.transform.scale(blockImage, (blockSize, blockSize)),
-                        }
-                blocks.append(newBlock)
+                # Add new blocks at the top of the screen, if needed.
+                blockAddCounter += 1
+                timeCounter += 1
+                if blockAddCounter >= ADDNEWBLOCKRATE:
+                        blockAddCounter = 0
+                        blockSize = random.randint(BLOCKMINSIZE, BLOCKMAXSIZE)
+                        newBlock = {'rect': pygame.Rect(random.randint(0, WINDOWWIDTH - blockSize), 0 - blockSize, blockSize, blockSize),
+                                'speed': random.randint(BLOCKMINSPEED, BLOCKMAXSPEED),
+                                'surface': pygame.transform.scale(blockImage, (blockSize, blockSize)),
+                                }
+                        blocks.append(newBlock)
                 
-        # Increase block speed and spawn rate every 5 seconds.
-        # Also increases FIRINGRATE to help survival rate
-        if timeCounter == FPS * 5:
-                timeCounter = 0
-                BLOCKMINSPEED += 1
-                BLOCKMAXSPEED += 1
-                BLOCKMINSPEED += 5
-                BLOCKMAXSPEED += 5
-                if ADDNEWBLOCKRATE > 2:
-                        ADDNEWBLOCKRATE -= 1
-                if FIRINGRATE > 5:
-                        FIRINGRATE -= 1
+                # Increase block speed and spawn rate every 5 seconds.
+                # Also increases FIRINGRATE to help survival rate
+                if timeCounter == FPS * 5:
+                        timeCounter = 0
+                        BLOCKMINSPEED += 1
+                        BLOCKMAXSPEED += 1
+                        BLOCKMINSPEED += 5
+                        BLOCKMAXSPEED += 5
+                        if ADDNEWBLOCKRATE > 2:
+                                ADDNEWBLOCKRATE -= 1
+                        if FIRINGRATE > 5:
+                                FIRINGRATE -= 1
         
-        
-        # Move the player around.
-        if moveLeft and playerRect.left > 0:
-                playerRect.move_ip(-1 * PLAYERMOVERATE, 0)
-        if moveRight and playerRect.right < WINDOWWIDTH:
-                playerRect.move_ip(PLAYERMOVERATE, 0)
-        if moveUp and playerRect.top > 0:
-                playerRect.move_ip(0, -1 * PLAYERMOVERATE)
-        if moveDown and playerRect.bottom < WINDOWHEIGHT:
-                playerRect.move_ip(0, PLAYERMOVERATE)
+                # Move the player around.
+                if moveLeft and playerRect.left > 0:
+                        playerRect.move_ip(-1 * PLAYERMOVERATE, 0)
+                if moveRight and playerRect.right < WINDOWWIDTH:
+                        playerRect.move_ip(PLAYERMOVERATE, 0)
+                if moveUp and playerRect.top > 0:
+                        playerRect.move_ip(0, -1 * PLAYERMOVERATE)
+                if moveDown and playerRect.bottom < WINDOWHEIGHT:
+                        playerRect.move_ip(0, PLAYERMOVERATE)
+                
+                # Make new bullets constantly.
+                bulletCounter += 1
+                if bulletCounter >= FIRINGRATE:
+                        bulletCounter = 0
+                        newBullet = {'rect': pygame.Rect(playerRect.left + 8, playerRect.top, 4, 12),
+                                'speed': BULLETSPEED,
+                                'surface': pygame.transform.scale(bulletImage, (4, 12)),
+                                }
+                        bullets.append(newBullet)
+                        
+                # Move the blocks down.
+                for b in blocks:
+                        b['rect'].move_ip(0, b['speed'])
             
-        # Move the blocks down.
-        for b in blocks:
-            b['rect'].move_ip(0, b['speed'])
+                # Delete blocks that have fallen past the bottom.
+                for b in blocks[:]:
+                        if b['rect'].top > WINDOWHEIGHT:
+                                blocks.remove(b)
+                                
+                # Fire bullets.
+                for bullet in bullets:
+                        bullet['rect'].move_ip(0, -bullet['speed'])                
+                                
+                # Delete bullets that reaches the top of screen
+                        for bullet in bullets[:]:
+                                if bullet['rect'].bottom < 0:
+                                        bullets.remove(bullet)                
+                                
+                # Draw the game world on the window.
+                windowSurface.fill(WHITEBACKGROUND)
+
+                # Draw the score and top score.
+                drawText('Score: %s' % (score), bigFont, windowSurface, 10, 0)
+                drawText('Top Score: %s' % (topScore), bigFont, windowSurface, 10, 40)
+
+                # Draw the player's rectangle
+                windowSurface.blit(playerImage, playerRect)
+
+                # Draw each block
+                for b in blocks:
+                        windowSurface.blit(i['surface'], i['rect'])
+
+                # Draw bullets
+                for bullet in bullets:
+                        windowSurface.blit(bullet['surface'], bullet['rect'])
             
-        # Delete blocks that have fallen past the bottom.
-        for b in blocks[:]:
-            if b['rect'].top > WINDOWHEIGHT:
-                blocks.remove(b)
+                pygame.display.update()
+
+                # Check if bullet hit blocks
+                for bullet in bullets:
+                        ifBulletHitBlock(bullet['rect'], blocks)
+
+                # Check if any of the blocks have hit the player.
+                if playerHasHitBlock(playerRect, blocks):
+                        if score > topScore:
+                                topScore = score # set new top score
+                                outFile = open("topScore.txt", "w")
+                                print(topScore, file = outFile)
+                                outFile.close()
+                        break           
+            
+                pygame.display.update()
+                mainClock.tick(FPS)
+
+        # Stop the game and show the "Game Over" screen.
+        windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+        windowSurface.fill(WHITEBACKGROUND)
+        drawCenteredText('GAME OVER', bigFont, windowSurface, WINDOWWIDTH, (WINDOWHEIGHT / 3))
+        drawCenteredText('Your score is: %s' % score, bigFont, windowSurface, WINDOWWIDTH, (WINDOWHEIGHT / 3) + 35)
+        drawCenteredText('Press SPACE to play again', smallFont, windowSurface, WINDOWWIDTH, (WINDOWHEIGHT / 3) + 70)
+        drawCenteredText('Press ESC to quit', smallFont, windowSurface, WINDOWWIDTH, (WINDOWHEIGHT / 3) + 95)
+        pygame.display.update()
+        waitForPlayerToPressKey()
+
+        # Resets globals before new game
+        timeCounter = 0
+        BLOCKMINSIZE = 10
+        BLOCKMAXSIZE = 40
+        BLOCKMINSPEED = 1
+        BLOCKMAXSPEED = 7
+        ADDNEWBLOCKRATE = 10
+        FIRINGRATE = 10
